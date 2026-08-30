@@ -1,0 +1,146 @@
+[
+  {
+    "name": "machine_mindset",
+    "label": "Machine Mindset MBTI DPO",
+    "repo": "PKU-YuanGroup/Machine-Mindset",
+    "commit": "5ee14c144fc59579a6c77e553acb2b6b56a54d7d",
+    "local_dir": "external/Machine-Mindset",
+    "paper": "https://arxiv.org/abs/2312.12999",
+    "license": "Apache-2.0",
+    "execution": "released_checkpoint",
+    "default_model": "FarReelAILab/Machine_Mindset_en_ISTJ",
+    "resolved_commit": "5ee14c144fc59579a6c77e553acb2b6b56a54d7d",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "PKU-YuanGroup/Machine-Mindset"
+    ]
+  },
+  {
+    "name": "persllm",
+    "label": "PersLLM automatic DPO",
+    "repo": "Ellenzzn/PersLLM",
+    "commit": "f0b58b1896e716267f27d823c84b0511a0d0647d",
+    "local_dir": "external/PersLLM",
+    "paper": "https://arxiv.org/abs/2407.12393",
+    "license": "repository-license",
+    "execution": "official_training",
+    "default_model": "miniCPM-mc-format",
+    "resolved_commit": "f0b58b1896e716267f27d823c84b0511a0d0647d",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "Ellenzzn/PersLLM"
+    ]
+  },
+  {
+    "name": "personality_vector",
+    "label": "Geometry of Personality activation steering",
+    "repo": "gunmayhanda/The-Geometry-of-Personality",
+    "commit": "47628a9982c4532d19b16d7aa4c66228d0f304ad",
+    "local_dir": "external/Geometry-of-Personality",
+    "paper": "https://arxiv.org/abs/2407.17491",
+    "license": "repository-license",
+    "execution": "official_notebooks",
+    "default_model": "google/gemma-2-2b-it",
+    "resolved_commit": "47628a9982c4532d19b16d7aa4c66228d0f304ad",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "gunmayhanda/The-Geometry-of-Personality"
+    ]
+  },
+  {
+    "name": "rolellm",
+    "label": "RoleLLM RoCIT/RoleBench",
+    "repo": "InteractiveNLP-Team/RoleLLM-public",
+    "commit": "131a157c9962f46d36a29bcec6962b5acfa7644a",
+    "local_dir": "external/RoleLLM-public",
+    "paper": "https://arxiv.org/abs/2310.00746",
+    "license": "repository-license",
+    "execution": "benchmark_only",
+    "default_model": "meta-llama/Llama-2-7b-chat-hf",
+    "resolved_commit": "131a157c9962f46d36a29bcec6962b5acfa7644a",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "InteractiveNLP-Team/RoleLLM-public"
+    ]
+  },
+  {
+    "name": "personagym",
+    "label": "PersonaGym dynamic evaluation",
+    "repo": "vsamuel2003/PersonaGym",
+    "commit": "536f705e610289c38d84e083fcea6ea5093d3a25",
+    "local_dir": "external/PersonaGym",
+    "paper": "https://arxiv.org/abs/2407.18416",
+    "license": "repository-license",
+    "execution": "benchmark_only",
+    "default_model": "gpt-4o-mini",
+    "resolved_commit": "536f705e610289c38d84e083fcea6ea5093d3a25",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "vsamuel2003/PersonaGym"
+    ]
+  },
+  {
+    "name": "representation_engineering",
+    "label": "Representation Engineering",
+    "repo": "andyzoujm/representation-engineering",
+    "commit": "5455d8a375d5fb1cb191f9ebcd089b7c21e9a31e",
+    "local_dir": "external/representation-engineering",
+    "paper": "https://arxiv.org/abs/2310.01405",
+    "license": "MIT",
+    "execution": "official_notebooks",
+    "default_model": "google/gemma-2-2b-it",
+    "resolved_commit": "5455d8a375d5fb1cb191f9ebcd089b7c21e9a31e",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "andyzoujm/representation-engineering"
+    ]
+  },
+  {
+    "name": "big5_chat",
+    "label": "BIG5-CHAT human-grounded Big Five training data",
+    "repo": "wenkai-li/Big5-Chat",
+    "commit": "fb50e6a7af599c0cdb86df4e18a4d1bb89c28da8",
+    "local_dir": "external/BIG5-CHAT",
+    "paper": "https://arxiv.org/abs/2410.16491",
+    "license": "repository-license",
+    "execution": "dataset_only",
+    "default_model": "wenkai-li/big5_chat",
+    "resolved_commit": "fb50e6a7af599c0cdb86df4e18a4d1bb89c28da8",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "wenkai-li/Big5-Chat"
+    ]
+  },
+  {
+    "name": "simpo",
+    "label": "SimPO reference-free preference optimization",
+    "repo": "princeton-nlp/SimPO",
+    "commit": "1b3e8f3528a23bce3da514a2dce8ea7490d4bc75",
+    "local_dir": "external/SimPO",
+    "paper": "https://arxiv.org/abs/2405.14734",
+    "license": "MIT",
+    "execution": "official_training",
+    "default_model": "princeton-nlp/gemma-2-9b-it-SimPO",
+    "resolved_commit": "1b3e8f3528a23bce3da514a2dce8ea7490d4bc75",
+    "clone_command": [
+      "gh",
+      "repo",
+      "clone",
+      "princeton-nlp/SimPO"
+    ]
+  }
+]

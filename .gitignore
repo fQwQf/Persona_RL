@@ -1,0 +1,68 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.basedpyright/
+.coverage
+htmlcov/
+
+# Local agent/editor state
+.omo/
+.codegraph
+.vscode/
+.idea/
+*.swp
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Models, generated data, logs and experiment outputs
+persona_rl/artifacts/
+persona_rl/data/processed/
+persona_rl/data/generated/
+persona_rl/data/raw/
+persona_rl/external/
+checkpoints/
+outputs/
+logs/
+wandb/
+mlruns/
+*.log
+*.manifest.json
+
+# Large model/data formats
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.gguf
+*.onnx
+*.arrow
+*.parquet
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Keep empty published directory skeletons
+!persona_rl/artifacts/
+persona_rl/artifacts/*
+!persona_rl/artifacts/.gitkeep
+!persona_rl/data/processed/
+persona_rl/data/processed/*
+!persona_rl/data/processed/.gitkeep
+!persona_rl/data/raw/
+persona_rl/data/raw/*
+!persona_rl/data/raw/.gitkeep
+!persona_rl/external/
+persona_rl/external/*
+!persona_rl/external/.gitkeep

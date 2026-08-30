@@ -1,0 +1,27 @@
+{
+  "schema_version": "experiment-v1",
+  "primary_methods": ["base", "prompt_only", "sft", "direct_dpo", "pc_dpo"],
+  "external_reference_methods": ["machine_mindset", "persllm", "personality_vector", "rolellm", "personagym", "representation_engineering", "big5_chat", "simpo"],
+  "related_work_only": ["personaforge"],
+  "splits": {
+    "train": "four behavior families with paired target vectors",
+    "validation": "negative-feedback family held out for checkpoint and rubric selection",
+    "test": "multi-step-plan family held out for final reporting"
+  },
+  "scenario_generation": {
+    "split_strategy": "family_holdout",
+    "counterfactual_pairs": true,
+    "capability_count": 300
+  },
+  "samples_per_condition": 3,
+    "prompt_variants": ["canonical", "paraphrase", "minimal", "formal", "terse", "conversational"],
+  "temperatures": [0.2, 0.7],
+  "required_outputs": ["experiment_manifest.json", "run_manifest.json", "predictions.jsonl", "scores.jsonl", "report/report_manifest.json", "report/report.md", "report/report.html", "report/summary.csv", "report/summary.json", "report/review_queue.jsonl", "validation.json"],
+  "primary_endpoints": ["behavior_validity", "prompt_invariance_icc", "truthfulness", "safety", "sycophancy", "capability_retention"],
+  "statistics": {
+    "cluster_unit": "scenario_id",
+    "confidence_interval": "percentile bootstrap, 1000 rounds, seed 7",
+    "primary_effect": "paired right-minus-left delta"
+  },
+  "provenance_policy": "Use pinned public repositories and released checkpoints where available; never report an unpinned or hand-edited baseline."
+}

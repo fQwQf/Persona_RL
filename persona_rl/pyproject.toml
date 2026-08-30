@@ -1,0 +1,29 @@
+[project]
+name = "persona-rl"
+version = "0.1.0"
+description = "Reproducible psychometrics-constrained personality preference optimization experiments"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.8",
+  "typer>=0.12",
+  "rich>=13.7",
+  "polars>=1.0",
+]
+
+[project.optional-dependencies]
+train = ["torch>=2.3", "transformers>=4.44", "datasets>=2.20", "peft>=0.12", "trl>=0.10", "accelerate>=0.33", "bitsandbytes>=0.43"]
+judge = ["openai>=1.40"]
+
+[tool.pyright]
+typeCheckingMode = "all"
+include = ["src", "scripts", "tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
