@@ -78,6 +78,21 @@ uv run scripts/fetch_public.py <URL> data/raw/external/file.jsonl --sha256 <KNOW
 git -C data/raw/PsychoBench rev-parse HEAD
 ```
 
+外部数据集的 allow-list 位于 `configs/external_datasets.json`。它们默认只用于评测，避免把外部 benchmark 反向泄漏到训练：
+
+```bash
+# 支持 HF_ENDPOINT 镜像；首次运行会下载并缓存数据集
+export HF_ENDPOINT=https://hf-mirror.com
+uv run scripts/fetch_external_datasets.py persona_chat --output-dir data/raw/external
+uv run scripts/fetch_external_datasets.py empathetic_dialogues --output-dir data/raw/external
+uv run scripts/fetch_external_datasets.py prosocial_dialog --output-dir data/raw/external
+uv run scripts/fetch_external_datasets.py truthful_qa --output-dir data/raw/external
+```
+
+每个目录都会生成 `manifest.json`，记录 Hugging Face dataset id、split、revision、语言、行数和 SHA-256。下载失败时不要用未经核验的同名 GitHub/Kaggle 文件替代；先在 registry 中登记来源和许可证。PersonaChat 的 ParlAI 版本通过 `gh repo clone facebookresearch/ParlAI external/ParlAI` 获取，记录仓库 commit 后再按其官方脚本下载。
+
+外部 JSONL 不是直接的 DPO 训练对。使用 `normalize_external.py` 前，必须先写一个针对该数据集的 adapter，将其转换为统一 `scenario_id,response` 或评测输入；没有隐藏行为标签的数据集只能作为外部行为/安全压力测试，并在报告中标记 `role`，不能伪装成 Big Five 金标准。
+
 LLM 扩写（支持 OpenAI、vLLM 或其他兼容服务）：
 
 ```bash

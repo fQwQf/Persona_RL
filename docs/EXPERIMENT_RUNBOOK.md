@@ -21,6 +21,18 @@ uv run scripts/audit_cli.py data/raw/scenarios.jsonl \
 
 每个 counterfactual group 必须只改变一个 trait；其他 trait 为 0。测试按 family 留出，而不是随机句子划分。正式数据使用独立 LLM 扩写候选，`build_preferences.py` 的占位 pair 禁止用于论文训练。
 
+另外下载外部 frozen evaluation（不参与训练）：
+
+```bash
+export HF_ENDPOINT=https://hf-mirror.com
+uv run scripts/fetch_external_datasets.py persona_chat --output-dir data/raw/external
+uv run scripts/fetch_external_datasets.py empathetic_dialogues --output-dir data/raw/external
+uv run scripts/fetch_external_datasets.py prosocial_dialog --output-dir data/raw/external
+uv run scripts/fetch_external_datasets.py truthful_qa --output-dir data/raw/external
+```
+
+每个外部源必须保留 `manifest.json`、许可证和下载 revision。PersonaChat 的 GitHub/ParlAI 版本需用 `gh repo clone` 并记录 commit。外部数据先通过 dataset-specific adapter 转成评测 schema；没有人格标签的数据只能报告为行为、同理心、安全或真实性外部效度，不能当作人格训练金标准。
+
 ## 3. 双 Judge 构造偏好
 
 ```bash
