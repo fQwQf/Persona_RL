@@ -48,6 +48,16 @@ export PYTHONPATH="$PWD/src"
 
 ## 数据管线
 
+### 数据从哪里来
+
+仓库不提交模型权重，也不把大规模外部人格数据偷偷混入训练。当前数据有三种来源：
+
+1. **训练/开发情境**：`scripts/generate_scenarios.py` 根据版本化模板和固定 seed 程序化生成 JSONL。它产生隐藏行为任务、trait 目标、反事实组和 family split；正式运行时应重新生成并保存输入 SHA-256。
+2. **偏好对**：`scripts/expand_with_llm.py` 通过 OpenAI-compatible 服务调用独立生成模型，为训练情境产生多个候选回答；`scripts/judge_pairs.py` 再用两个独立 judge 评分、过滤硬约束失败和 tie，并写出审计 provenance。生成器/judge 可以是服务器上的 vLLM，也可以是远端 API，但不能使用待训练 checkpoint。
+3. **外部冻结评测**：`data/raw/PsychoBench` 是通过固定 Git commit 获取的公开资源，仅用于 frozen evaluation，不进入训练。下载或更新外部资源必须保留原仓库 LICENSE、commit 和 SHA-256 manifest。
+
+因此，`data/raw/scenarios.jsonl`、候选对、judge 缓存和模型文件默认被 `.gitignore` 忽略；论文复现包应发布它们的 manifest、split ID、生成配置和哈希，而不是把密钥或未经许可的原始数据提交到 Git。
+
 ```bash
 uv run scripts/generate_scenarios.py --output data/raw/scenarios.jsonl --count 1800 --capability-count 300 --seed 7 --split-strategy family_holdout
 uv run scripts/audit_cli.py data/raw/scenarios.jsonl --output-path data/processed/audit.jsonl --limit 100
@@ -55,6 +65,16 @@ uv run scripts/build_preferences.py data/raw/scenarios.jsonl --output-path data/
 ```
 
 `build_preferences.py` 的 chosen/rejected 是 smoke-test 占位数据。正式实验必须替换为 LLM 扩写、双 judge、规则过滤后的候选对，不能把占位文本作为论文数据。
+
+### 获取外部数据
+
+```bash
+# 下载单个公开文件并写入 <file>.manifest.json
+uv run scripts/fetch_public.py <URL> data/raw/external/file.jsonl --sha256 <KNOWN_SHA256>
+
+# 已克隆的 PsychoBench 目录只作为 frozen evaluation 输入
+git -C data/raw/PsychoBench rev-parse HEAD
+```
 
 LLM 扩写（支持 OpenAI、vLLM 或其他兼容服务）：
 
@@ -75,6 +95,50 @@ PYTHONPATH=src uv run scripts/judge_pairs.py data/processed/candidate_pairs.json
 ```
 
 `judge_pairs.py` 同时写出 `judged_pairs.audit.jsonl`，保留每行的两个 judge、阈值拒绝原因和是否进入训练；正式实验应报告保留率和 judge disagreement，而不是只提交筛选后的 pair。
+
+## 模型下载与加载
+
+### Hugging Face 模型
+
+训练和 HF 推理都使用 `transformers.AutoTokenizer.from_pretrained` 与 `AutoModelForCausalLM.from_pretrained`。第一次运行时，Transformers 会从 Hugging Face Hub 下载模型到本机缓存；后续运行复用缓存。服务器建议显式设置缓存目录并固定 revision：
+
+```bash
+export HF_HOME=/scratch/$USER/huggingface
+export TRANSFORMERS_CACHE=$HF_HOME/transformers
+export HF_TOKEN=...                 # 仅私有/受限模型需要
+uv sync --extra train
+
+# 先单独预下载并验证权重，避免训练中途才发现网络或磁盘问题
+uv run python - <<'PY'
+from transformers import AutoTokenizer, AutoModelForCausalLM
+model = "Qwen/Qwen2.5-7B-Instruct"
+revision = "<HF_COMMIT_HASH>"
+AutoTokenizer.from_pretrained(model, revision=revision)
+AutoModelForCausalLM.from_pretrained(model, revision=revision)
+print("model cache ready")
+PY
+```
+
+`train_dpo.py` 和 `train_sft.py` 的 `--model` 是 base model 名称或本地目录，`--model-revision` 是 Hub commit hash；二者都会把 revision 写入训练输出配置。训练默认使用 LoRA/QLoRA：QLoRA 需要 CUDA、bitsandbytes 和约 16--24 GB 显存（7B 模型，具体取决于序列长度和 batch）。
+
+```bash
+uv run scripts/train_dpo.py data/processed/judged_pairs.jsonl \
+  --model Qwen/Qwen2.5-7B-Instruct --model-revision <HF_COMMIT_HASH> \
+  --method pc-dpo --output artifacts/checkpoints/pc_dpo_seed7
+```
+
+### LoRA checkpoint 推理
+
+`run_experiment.py --backend hf` 或 `run_inference.py --backend hf` 会检查 checkpoint 目录中的 `adapter_config.json`。如果存在，代码先读取其中的 `base_model_name_or_path`，加载相同 base model，再用 `peft.PeftModel.from_pretrained` 挂载 adapter；否则把路径当作完整 Transformers 模型直接加载。正式评测必须使用：
+
+```bash
+uv run scripts/run_experiment.py data/raw/scenarios.jsonl --backend hf \
+  --methods base,direct_dpo,pc_dpo \
+  --model-map base=Qwen/Qwen2.5-7B-Instruct,direct_dpo=artifacts/checkpoints/direct_dpo,pc_dpo=artifacts/checkpoints/pc_dpo \
+  --model-revision <HF_COMMIT_HASH> --scorer none
+```
+
+不要把同一个 base model 路径作为训练方法的 checkpoint；程序会要求 `sft`、`direct_dpo` 和 `pc_dpo` 显式提供 `--model-map`。多 GPU 训练使用 `accelerate launch`，推理使用 rank shard 后再运行 `merge_predictions.py`，避免多个进程同时写一个 JSONL。
 
 ## 统一实验输出
 
