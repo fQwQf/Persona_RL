@@ -152,6 +152,16 @@ $$A_{jk}=E[Y_j|do(z_k=+1)]-E[Y_j|do(z_k=-1)].$$
 
 报告对角 target effect、非对角 leakage 和稀疏度。重点检查宜人性是否增加 sycophancy、尽责性是否造成过度冗长、诚实-谦逊是否造成过度拒答。
 
+### E4b Trait × Style 正交操纵（新增主实验）
+
+E3 的改写和 E4 的单 trait 干预不足以证明人格目标与表达风格是两个独立变量，因此加入严格的 2×6 因子实验。每个隐藏行为情境配两个 trait 条件（目标 trait 高/低）和六种独立 style 条件：`neutral`、`warm/polite`、`blunt/direct`、`formal`、`terse`、`conversational`。style 只改变措辞、礼貌标记、句长和格式，不改变事实、行动、拒绝/接受决定或风险信息。
+
+必须包含预注册的冲突单元：高宜人性×`blunt/direct`、低宜人性×`warm/polite`、高尽责性×`terse`、低尽责性×`formal`、高诚实-谦逊×`conversational`、低诚实-谦逊×`warm/polite`。每个方法、模型家族和 seed 至少保留 100 个情境族，所有方法共享完全相同的单元。
+
+对每个输出记录行为结果 Y_b、trait 评分 Y_t、style 评分 Y_s 和安全/真实性结果 Y_q。预注册混合效应模型：`Y ~ trait * style + (1|family) + (1|scenario)`。核心检验是：CB-DPO 保留 trait 主效应，在六种 style 上的最小 trait effect 为正且 CI 不跨 0；style 可以改变 Y_s，但不应系统改变 Y_b 或 Y_q；trait×style 交互项和冲突单元反转率应显著低于 Direct-DPO。
+
+对同一输出执行 style-normalization，再由第二 judge 评分。若只改变 style 便反转 trait 判断，属于 style confound；若归一化后行为动作仍保持目标方向，则支持行为层学习。主要报告每个因子单元的均值和 95% CI、trait/style/交互系数、跨 style ICC、行为 style-slope、冲突反转率和归一化前后差值，禁止用关键词命中率替代这些指标。
+
 ### E5 安全和能力
 
 测试错误事实附和、越权、隐私泄露、危险请求、prompt injection、事实校准、数学和代码。报告绝对分数及相对 base 的变化。
@@ -181,6 +191,7 @@ $$A_{jk}=E[Y_j|do(z_k=+1)]-E[Y_j|do(z_k=-1)].$$
 5. 使用同源 judge 训练和测试；
 6. 训练数据量 25%、50%、100%；
 7. 第二模型家族迁移。
+8. 去掉 Trait × Style 冲突样本：检验正交数据是否是 CB-DPO 在冲突条件下保持行为稳定性的必要来源。
 
 ## 6. 统计方案
 

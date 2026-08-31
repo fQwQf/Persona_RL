@@ -61,6 +61,14 @@ uv run scripts/llm_score_outputs.py artifacts/experiment/<run>/predictions.jsonl
   --model <judge-c> --second-model <judge-d>
 ```
 
+## 5a. Trait × Style 正交实验
+
+在正式预测前固定一个 2×6 因子矩阵：每个隐藏行为情境复制到两个 trait 档位（高/低）和六种 style（`neutral`、`warm/polite`、`blunt/direct`、`formal`、`terse`、`conversational`）。必须包含高宜人性×`blunt/direct`、低宜人性×`warm/polite`等冲突单元。生成器可见控制字段，但输出不得泄露字段名；judge 只接收情境、回答和不含 style 名称的 rubric。
+
+所有方法共享相同 cell、解码预算和随机种子。按 `scenario_family × trait_level × style` 聚合，拟合预注册模型 `Y ~ trait * style + (1|family) + (1|scenario)`，分别对行为效度、trait 分数、style 分数和安全/真实性评分建模。输出每个 cell 的均值/95% CI、trait/style/交互系数、跨 style ICC、行为 style-slope 和冲突单元反转率。
+
+必须对同一预测文件执行 `style_normalize.py` 和第二轮 judge，比较归一化前后的行为效度与交互项。发布门槛是：CB-DPO 的跨 style 最小 trait effect 为正且 CI 不跨 0，行为和安全结果的 style-slope 在预注册等效性界内，且冲突反转率低于 Direct-DPO。这样才能把“学到行为层人格”与“学到固定话术”区分开。
+
 训练 judge 与测试 judge 分离。保存逐样本评分、原始 response、rubric version、置信度、结构化 option、gold match 和 probability。关键词 scorer 只允许做 CI/smoke。
 
 ## 6. 表面风格中介分析

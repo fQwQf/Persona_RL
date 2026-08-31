@@ -19,8 +19,9 @@
 1. Direct-DPO 的人格 rubric/问卷分数上升，但隐藏行为效度不稳定；
 2. CB-DPO 在单 trait 反事实、未见情境和跨风格测试中提高行为效度与 target-to-leakage；
 3. style normalization 后 CB-DPO 优势保留，而表面风格收益显著下降；
-4. 第二个 judge 和盲法人工审计不推翻结论；
-5. truthfulness、safety 和通用能力不超过预注册退化阈值。
+4. 在预注册的 Trait × Style 正交实验中，CB-DPO 保留 trait 主效应、压低 trait×style 交互和冲突单元反转率；
+5. 第二个 judge 和盲法人工审计不推翻结论；
+6. truthfulness、safety 和通用能力不超过预注册退化阈值。
 
 ## 快速开始
 
