@@ -45,7 +45,7 @@ PersonaForge 仅作为最接近的 related work 和概念 reference，引用与�
 
 ```bash
 cd persona_rl
-uv sync --extra train --extra judge
+uv sync --extra train --extra judge --extra analysis
 export PYTHONPATH="$PWD/src"
 ```
 
@@ -275,6 +275,8 @@ PYTHONPATH=src uv run scripts/validate_artifacts.py \
 PYTHONPATH=src uv run scripts/analyze_trait_style.py \
   artifacts/experiment/<run_id>/scores.jsonl \
   --output-dir artifacts/experiment/<run_id>/report/trait_style
+
+# 安装 analysis extra 后，trait_style_model.json 会包含 MixedLM 固定效应和 p 值
 ```
 
 推理多 GPU 时让每个 rank 写独立 shard，避免并发写同一个 JSONL：
