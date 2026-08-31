@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 TraitName = Literal["conscientiousness", "agreeableness", "honesty_humility"]
 SplitName = Literal["train", "validation", "test", "audit"]
+LanguageName = Literal["zh", "en"]
 
 
 class TargetTraits(BaseModel):
@@ -51,6 +52,7 @@ class Scenario(BaseModel):
     hidden_task: HiddenTask
     counterfactual_group: str = Field(min_length=1)
     style_family: str = "neutral"
+    language: LanguageName = "zh"
 
 
 SCHEMA_VERSION: Final[str] = "scenario-v1"

@@ -59,10 +59,12 @@ export PYTHONPATH="$PWD/src"
 因此，`data/raw/scenarios.jsonl`、候选对、judge 缓存和模型文件默认被 `.gitignore` 忽略；论文复现包应发布它们的 manifest、split ID、生成配置和哈希，而不是把密钥或未经许可的原始数据提交到 Git。
 
 ```bash
-uv run scripts/generate_scenarios.py --output data/raw/scenarios.jsonl --count 1800 --capability-count 300 --seed 7 --split-strategy family_holdout
+uv run scripts/generate_scenarios.py --output data/raw/scenarios.jsonl --count 6000 --capability-count 600 --seed 7 --split-strategy family_holdout --languages zh,en
 uv run scripts/audit_cli.py data/raw/scenarios.jsonl --output-path data/processed/audit.jsonl --limit 100
 uv run scripts/build_preferences.py data/raw/scenarios.jsonl --output-path data/processed/preferences.jsonl
 ```
+
+当前模板库包含 24 个独立情境族，按 `--languages zh,en` 交替生成中英文样本；正式主实验建议至少 6,000 条情境（训练约 70%，验证 15%，测试 15%），并报告每个 family 和语言的数量。模板数量、语言字段和 split 受版本控制，但具体 JSONL 默认不提交仓库。
 
 `build_preferences.py` 的 chosen/rejected 是 smoke-test 占位数据。正式实验必须替换为 LLM 扩写、双 judge、规则过滤后的候选对，不能把占位文本作为论文数据。
 
@@ -120,6 +122,22 @@ PY
 ```
 
 `train_dpo.py` 和 `train_sft.py` 的 `--model` 是 base model 名称或本地目录，`--model-revision` 是 Hub commit hash；二者都会把 revision 写入训练输出配置。训练默认使用 LoRA/QLoRA：QLoRA 需要 CUDA、bitsandbytes 和约 16--24 GB 显存（7B 模型，具体取决于序列长度和 batch）。
+
+网络受限时优先使用 Hugging Face 镜像或 ModelScope 预下载，再把生成的本地目录作为 `--model`：
+
+```bash
+# Hugging Face 镜像（镜像地址由服务器管理员提供）
+export HF_ENDPOINT=https://hf-mirror.com
+uv run scripts/download_model.py Qwen/Qwen2.5-7B-Instruct \
+  --output /scratch/models/qwen25-7b --source huggingface --revision <HF_COMMIT_HASH>
+
+# ModelScope
+uv pip install modelscope
+uv run scripts/download_model.py Qwen/Qwen2.5-7B-Instruct \
+  --output /scratch/models/qwen25-7b --source modelscope
+```
+
+ModelScope 下载后的目录与 Transformers 兼容时可以直接用于 `--model /scratch/models/qwen25-7b`；如果模型卡片要求转换格式，应先按其官方说明转换，不能只改文件名伪装成 Hugging Face checkpoint。`download_model.py` 会写入 `model.manifest.json`，记录来源、revision、文件数和权重树哈希。
 
 ```bash
 uv run scripts/train_dpo.py data/processed/judged_pairs.jsonl \
