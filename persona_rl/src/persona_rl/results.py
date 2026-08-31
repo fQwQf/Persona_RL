@@ -78,6 +78,7 @@ class PredictionRecord(BaseModel):
     target: dict[str, int]
     target_intensity: float = Field(default=1.0, ge=0, le=1)
     prompt_variant: str = "canonical"
+    style_family: str = "neutral"
     language: str = "zh"
     temperature: float = Field(ge=0, le=2)
     sample_index: int = Field(ge=0)

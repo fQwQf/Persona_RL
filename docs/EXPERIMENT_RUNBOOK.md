@@ -33,6 +33,16 @@ uv run scripts/fetch_external_datasets.py truthful_qa --output-dir data/raw/exte
 
 每个外部源必须保留 `manifest.json`、许可证和下载 revision。PersonaChat 的 GitHub/ParlAI 版本需用 `gh repo clone` 并记录 commit。外部数据先通过 dataset-specific adapter 转成评测 schema；没有人格标签的数据只能报告为行为、同理心、安全或真实性外部效度，不能当作人格训练金标准。
 
+当前 adapter 的实际运行方式：
+
+```bash
+uv run scripts/prepare_external_eval.py truthful_qa \
+  data/raw/external/truthful_qa/validation.jsonl \
+  data/raw/external/truthful_qa/eval_scenarios.jsonl --limit 500
+```
+
+然后把生成的 `eval_scenarios.jsonl` 作为 `run_experiment.py` 输入。adapter 输出带来源标签和 `training_allowed=false` manifest；在任何训练命令前运行发布校验，禁止把 `data/raw/external/**/eval_scenarios.jsonl` 作为 DPO 数据。
+
 ## 3. 双 Judge 构造偏好
 
 ```bash
@@ -80,6 +90,8 @@ uv run scripts/llm_score_outputs.py artifacts/experiment/<run>/predictions.jsonl
 所有方法共享相同 cell、解码预算和随机种子。按 `scenario_family × trait_level × style` 聚合，拟合预注册模型 `Y ~ trait * style + (1|family) + (1|scenario)`，分别对行为效度、trait 分数、style 分数和安全/真实性评分建模。输出每个 cell 的均值/95% CI、trait/style/交互系数、跨 style ICC、行为 style-slope 和冲突单元反转率。
 
 必须对同一预测文件执行 `style_normalize.py` 和第二轮 judge，比较归一化前后的行为效度与交互项。发布门槛是：CB-DPO 的跨 style 最小 trait effect 为正且 CI 不跨 0，行为和安全结果的 style-slope 在预注册等效性界内，且冲突反转率低于 Direct-DPO。这样才能把“学到行为层人格”与“学到固定话术”区分开。
+
+用 `analyze_trait_style.py` 生成 `trait_style_cells.csv` 和 `trait_style_coefficients.json`；其中 `trait_effect_by_style`、`min_trait_effect` 和 `effect_range` 必须进入主表或补充表。脚本以 prediction 中记录的 `style_family` 聚合，而不是从 prompt 文本猜测风格。
 
 训练 judge 与测试 judge 分离。保存逐样本评分、原始 response、rubric version、置信度、结构化 option、gold match 和 probability。关键词 scorer 只允许做 CI/smoke。
 

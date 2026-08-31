@@ -239,6 +239,7 @@ class InferenceEngine:
             target=record.target_z.model_dump(),
             target_intensity=record.target_intensity,
             prompt_variant=variant,
+            style_family=record.style_family,
             language=language,
             temperature=self.config.temperature,
             sample_index=sample_index,

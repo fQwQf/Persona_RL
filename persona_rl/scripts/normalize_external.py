@@ -86,6 +86,7 @@ def main(
                 temperature=row.temperature,
                 sample_index=index if row.sample_index is None else row.sample_index,
                 prompt_variant=row.prompt_variant,
+                style_family=scenario.style_family,
                 prompt=scenario.situation,
                 response=row.response,
                 latency_ms=0.0,

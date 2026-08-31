@@ -93,6 +93,19 @@ uv run scripts/fetch_external_datasets.py truthful_qa --output-dir data/raw/exte
 
 外部 JSONL 不是直接的 DPO 训练对。使用 `normalize_external.py` 前，必须先写一个针对该数据集的 adapter，将其转换为统一 `scenario_id,response` 或评测输入；没有隐藏行为标签的数据集只能作为外部行为/安全压力测试，并在报告中标记 `role`，不能伪装成 Big Five 金标准。
 
+仓库现在提供通用 frozen-eval adapter：
+
+```bash
+uv run scripts/prepare_external_eval.py persona_chat \
+  data/raw/external/persona_chat/train.jsonl \
+  data/raw/external/persona_chat/eval_scenarios.jsonl --limit 1000
+uv run scripts/run_experiment.py data/raw/external/persona_chat/eval_scenarios.jsonl \
+  --backend hf --methods base,direct_dpo,pc_dpo \
+  --model-map base=<base>,direct_dpo=<direct>,pc_dpo=<pc> --split test --scorer none
+```
+
+`prepare_external_eval.py` 会根据数据集类型提取问题/对话/正确答案，生成带 `source:<dataset>` 标签的 `Scenario`，并明确写入 `training_allowed=false`。字段不匹配时命令失败，不会静默产生伪造样本。
+
 LLM 扩写（支持 OpenAI、vLLM 或其他兼容服务）：
 
 ```bash
@@ -245,6 +258,11 @@ PYTHONPATH=src uv run scripts/validate_artifacts.py \
   artifacts/experiment/<run_id> \
   --expected-methods base,prompt_only,sft,direct_dpo,pc_dpo \
   --expected-variants canonical,paraphrase,minimal
+
+# Trait x Style cell、跨风格 trait effect 和 effect range
+PYTHONPATH=src uv run scripts/analyze_trait_style.py \
+  artifacts/experiment/<run_id>/scores.jsonl \
+  --output-dir artifacts/experiment/<run_id>/report/trait_style
 ```
 
 推理多 GPU 时让每个 rank 写独立 shard，避免并发写同一个 JSONL：
