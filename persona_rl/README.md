@@ -28,6 +28,10 @@
 
 - `scripts/audit_cli.py`：低规模交互式 rubric 审计，不产生训练标签。
 - `scripts/fetch_public.py`：下载公开数据并记录 SHA-256 manifest。
+- `scripts/fetch_external_datasets.py`：按 allow-list 下载 Hugging Face 外部数据并记录 manifest。
+- `scripts/prepare_external_eval.py`：将 PersonaChat/EmpatheticDialogues/ProsocialDialog/TruthfulQA 原始字段转换为 frozen `Scenario`。
+- `scripts/download_model.py`：通过 Hugging Face 镜像或 ModelScope 预下载模型并生成权重树 hash。
+- `scripts/analyze_trait_style.py`：输出 Trait × Style cell 和跨风格 trait effect。
 - `scripts/train_dpo.py`：Direct-DPO/PC-DPO 训练入口。
 - `scripts/train_sft.py`：同模型、同 token budget 的 SFT LoRA 对照。
 - `scripts/evaluate.py`：聚合评测 JSONL。

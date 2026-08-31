@@ -28,22 +28,41 @@ def main(scores: Path, output_dir: Path = Path("artifacts/trait_style")) -> None
     with (output_dir / "trait_style_cells.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields); writer.writeheader(); writer.writerows(records)
     effects = defaultdict(list)
+    reversals = []
     for (method, _base, style), values in pairs.items():
-        if 1 in values and -1 in values: effects[(method, style)].append(values[1] - values[-1])
+        if 1 in values and -1 in values:
+            delta = values[1] - values[-1]; effects[(method, style)].append(delta)
+            if delta < 0:
+                reversals.append({"method": method, "style": style, "delta": delta, "high": values[1], "low": values[-1]})
     coefficients = {}
     methods = sorted({r["method"] for r in records})
     for method in methods:
         by_style = {style: sum(values) / len(values) for (candidate, style), values in effects.items() if candidate == method}
         values = list(by_style.values())
+        center = sum(values) / len(values) if values else None
         coefficients[method] = {
             "trait_effect_by_style": by_style,
-            "mean_trait_effect": sum(values) / len(values) if values else None,
+            "mean_trait_effect": center,
             "min_trait_effect": min(values) if values else None,
             "max_trait_effect": max(values) if values else None,
             "effect_range": max(values) - min(values) if values else None,
+            "style_interaction_contrast": ({style: value - center for style, value in by_style.items()} if center is not None else {}),
             "n_cells": len([r for r in records if r["method"] == method]),
         }
     (output_dir / "trait_style_coefficients.json").write_text(json.dumps(coefficients, indent=2, ensure_ascii=False), encoding="utf-8")
+    (output_dir / "conflict_reversals.jsonl").write_text("".join(json.dumps(item, ensure_ascii=False) + "\n" for item in reversals), encoding="utf-8")
+    # Dependency-free SVG heatmap keeps analysis runnable on CPU-only servers.
+    styles = sorted({r["style"] for r in records}); methods = sorted({r["method"] for r in records})
+    width, height, cell = 180 + 100 * len(styles), 70 + 32 * len(methods), 28
+    svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"><style>text{{font:12px sans-serif}}</style>']
+    for j, style in enumerate(styles): svg.append(f'<text x="{170+j*100}" y="18">{style}</text>')
+    for i, method in enumerate(methods):
+        svg.append(f'<text x="4" y="{45+i*32}">{method}</text>')
+        for j, style in enumerate(styles):
+            value = coefficients.get(method, {}).get("trait_effect_by_style", {}).get(style)
+            color = "#cccccc" if value is None else ("#2166ac" if value >= 0 else "#b2182b")
+            svg.append(f'<rect x="{150+j*100}" y="{25+i*32}" width="90" height="24" fill="{color}"/><text fill="white" x="{155+j*100}" y="42">{value:.3f}</text>' if value is not None else f'<rect x="{150+j*100}" y="{25+i*32}" width="90" height="24" fill="{color}"/>')
+    svg.append('</svg>'); (output_dir / "trait_style_heatmap.svg").write_text("".join(svg), encoding="utf-8")
     typer.echo(f"wrote {len(records)} cells and coefficients for {len(coefficients)} methods")
 
 if __name__ == "__main__": app()

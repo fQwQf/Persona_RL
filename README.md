@@ -29,7 +29,7 @@
 cd persona_rl
 uv sync
 export PYTHONPATH="$PWD/src"
-uv run scripts/generate_scenarios.py --output data/raw/scenarios.jsonl --count 1800 --capability-count 300 --seed 7
+uv run scripts/generate_scenarios.py --output data/raw/scenarios.jsonl --count 6000 --capability-count 600 --seed 7 --split-strategy family_holdout --languages zh,en
 uv run scripts/expand_with_llm.py data/raw/scenarios.jsonl --output-path data/processed/candidate_pairs.jsonl --split train --resume
 uv run scripts/judge_pairs.py data/processed/candidate_pairs.jsonl --output-path data/processed/judged_pairs.jsonl --model <judge> --second-model <second-judge>
 uv run scripts/train_dpo.py data/processed/judged_pairs.jsonl --method pc-dpo --model <base-model> --output artifacts/checkpoints/pc_dpo_seed7
@@ -49,6 +49,7 @@ uv run scripts/llm_score_outputs.py artifacts/experiment/<run>/predictions.jsonl
   data/raw/scenarios.jsonl --output artifacts/experiment/<run>/scores.jsonl \
   --model <judge> --second-model <second-judge>
 uv run scripts/render_report.py artifacts/experiment/<run>/scores.jsonl --output-dir artifacts/experiment/<run>/report
+uv run scripts/analyze_trait_style.py artifacts/experiment/<run>/scores.jsonl --output-dir artifacts/experiment/<run>/trait_style
 ```
 
 主指标是 hidden behavior validity、AUROC/Brier/calibration、prompt/style ICC、单 trait effect、非目标 leakage、truthfulness、safety、sycophancy 和 capability retention。`style_normalize.py` 生成中性专业改写后，应重新执行 LLM judge 比较归一化前后效度。

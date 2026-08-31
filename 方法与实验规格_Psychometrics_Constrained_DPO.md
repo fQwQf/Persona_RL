@@ -42,7 +42,7 @@
 
 ### 2.3 情境数据
 
-建立 18 个情境族，每个维度 6 个。每个反事实组只改变一个 trait（其余两个固定为 0），并携带至少两个结构化行为选项和 `gold_option`；同一情境的正负 trait 不得复用同一个 gold label。当前生成器已实现这一约束，测试必须检查每个组的 Hamming distance 恰为 1。
+建立至少 24 个情境族（每个维度至少 8 个，正式运行建议继续扩展），并用中英文双语版本覆盖。每个反事实组只改变一个 trait（其余两个固定为 0），并携带至少两个结构化行为选项和 `gold_option`；同一情境的正负 trait 不得复用同一个 gold label。当前生成器已实现这一约束，测试必须检查每个组的 Hamming distance 恰为 1。
 
 #### 数据来源与许可
 
@@ -53,7 +53,7 @@
 3. **扩写层：** 使用与被测模型不同家族的开放模型生成角色、主题、措辞和对话历史；每条扩写保留模板 ID、生成模型、版本和随机种子。
 4. **标签层：** 由程序规则、可执行结果和两个不同 judge 生成偏好/评分。judge 只作为 noisy annotator，不能被描述为 ground truth；分歧样本进入争议集。
 
-外部数据（PersonaGym、PsychoBench、InCharacter 等）只作为 frozen holdout 或 baseline 评测，必须遵守各自 license，不应把其测试答案混入训练集。
+外部数据（PersonaChat、EmpatheticDialogues、ProsocialDialog、TruthfulQA、PsychoBench 等）只作为 frozen holdout 或 baseline 评测，必须遵守各自 license，不应把其测试答案混入训练集。`fetch_external_datasets.py` 负责下载和 hash manifest，`prepare_external_eval.py` 负责数据集专用字段适配和 `training_allowed=false` 标记。
 
 #### 顶会级质量要求
 
