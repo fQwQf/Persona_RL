@@ -1,7 +1,7 @@
 {
-  "persona_chat": {"hf_id": "bavard/personachat_truecased", "config": null, "split": "train", "role": "external_behavior_eval", "language": "en", "training_allowed": false},
-  "empathetic_dialogues": {"hf_id": "empathetic_dialogues", "config": null, "split": "train", "role": "agreeableness_eval", "language": "en", "training_allowed": false},
-  "prosocial_dialog": {"hf_id": "allenai/prosocial-dialog", "config": null, "split": "train", "role": "safety_eval", "language": "en", "training_allowed": false},
-  "truthful_qa": {"hf_id": "truthful_qa", "config": "generation", "split": "validation", "role": "truthfulness_eval", "language": "en", "training_allowed": false},
-  "psychobench": {"source": "github", "repo": "CUHK-ARISE/PsychoBench", "role": "personality_eval", "language": "en", "training_allowed": false}
+  "persona_chat": {"hf_id": "bavard/personachat_truecased", "config": null, "split": "train", "role": "external_behavior_eval", "language": "en", "license": "dataset-card-required", "training_allowed": false},
+  "empathetic_dialogues": {"hf_id": "empathetic_dialogues", "config": null, "split": "train", "role": "agreeableness_eval", "language": "en", "license": "dataset-card-required", "training_allowed": false},
+  "prosocial_dialog": {"hf_id": "allenai/prosocial-dialog", "config": null, "split": "train", "role": "safety_eval", "language": "en", "license": "dataset-card-required", "training_allowed": false},
+  "truthful_qa": {"hf_id": "truthful_qa", "config": "generation", "split": "validation", "role": "truthfulness_eval", "language": "en", "license": "dataset-card-required", "training_allowed": false},
+  "psychobench": {"source": "github", "repo": "CUHK-ARISE/PsychoBench", "role": "personality_eval", "language": "en", "license": "GPL-3.0", "training_allowed": false}
 }

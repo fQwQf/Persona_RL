@@ -32,6 +32,7 @@
 - `scripts/prepare_external_eval.py`：将 PersonaChat/EmpatheticDialogues/ProsocialDialog/TruthfulQA 原始字段转换为 frozen `Scenario`。
 - `scripts/download_model.py`：通过 Hugging Face 镜像或 ModelScope 预下载模型并生成权重树 hash。
 - `scripts/analyze_trait_style.py`：输出 Trait × Style cell 和跨风格 trait effect。
+- `scripts/audit_dataset.py`：检查外部/生成 JSONL 的哈希、重复、空文本和语言分布。
 - `scripts/train_dpo.py`：Direct-DPO/PC-DPO 训练入口。
 - `scripts/train_sft.py`：同模型、同 token budget 的 SFT LoRA 对照。
 - `scripts/evaluate.py`：聚合评测 JSONL。
@@ -109,6 +110,13 @@ uv run scripts/run_experiment.py data/raw/external/persona_chat/eval_scenarios.j
 ```
 
 `prepare_external_eval.py` 会根据数据集类型提取问题/对话/正确答案，生成带 `source:<dataset>` 标签的 `Scenario`，并明确写入 `training_allowed=false`。字段不匹配时命令失败，不会静默产生伪造样本。
+
+下载或生成数据后先运行审计：
+
+```bash
+uv run scripts/audit_dataset.py data/raw/scenarios.jsonl --output artifacts/scenario_audit.json
+uv run scripts/audit_dataset.py data/raw/external/persona_chat/train.jsonl --output artifacts/persona_chat_audit.json
+```
 
 LLM 扩写（支持 OpenAI、vLLM 或其他兼容服务）：
 

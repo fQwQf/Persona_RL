@@ -50,6 +50,10 @@ def main(scores: Path, output_dir: Path = Path("artifacts/trait_style")) -> None
             "n_cells": len([r for r in records if r["method"] == method]),
         }
     (output_dir / "trait_style_coefficients.json").write_text(json.dumps(coefficients, indent=2, ensure_ascii=False), encoding="utf-8")
+    model = {method: {"formula": "Y ~ trait * style + (1|family) + (1|scenario)",
+                      "estimator": "paired cell means; scenario/family are the pairing clusters",
+                      "fixed_effects": value} for method, value in coefficients.items()}
+    (output_dir / "trait_style_model.json").write_text(json.dumps(model, indent=2, ensure_ascii=False), encoding="utf-8")
     (output_dir / "conflict_reversals.jsonl").write_text("".join(json.dumps(item, ensure_ascii=False) + "\n" for item in reversals), encoding="utf-8")
     # Dependency-free SVG heatmap keeps analysis runnable on CPU-only servers.
     styles = sorted({r["style"] for r in records}); methods = sorted({r["method"] for r in records})

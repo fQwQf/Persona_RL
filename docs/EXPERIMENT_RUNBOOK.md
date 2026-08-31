@@ -91,7 +91,7 @@ uv run scripts/llm_score_outputs.py artifacts/experiment/<run>/predictions.jsonl
 
 必须对同一预测文件执行 `style_normalize.py` 和第二轮 judge，比较归一化前后的行为效度与交互项。发布门槛是：CB-DPO 的跨 style 最小 trait effect 为正且 CI 不跨 0，行为和安全结果的 style-slope 在预注册等效性界内，且冲突反转率低于 Direct-DPO。这样才能把“学到行为层人格”与“学到固定话术”区分开。
 
-用 `analyze_trait_style.py` 生成 `trait_style_cells.csv`、`trait_style_coefficients.json`、`trait_style_heatmap.svg` 和 `conflict_reversals.jsonl`；其中 `trait_effect_by_style`、`min_trait_effect` 和 `effect_range` 必须进入主表或补充表。脚本以 prediction 中记录的 `style_family` 聚合，而不是从 prompt 文本猜测风格。
+用 `analyze_trait_style.py` 生成 `trait_style_cells.csv`、`trait_style_coefficients.json`、`trait_style_model.json`、`trait_style_heatmap.svg` 和 `conflict_reversals.jsonl`；其中 `trait_effect_by_style`、`min_trait_effect`、`effect_range` 和固定效应公式必须进入主表或补充表。脚本以 prediction 中记录的 `style_family` 聚合，而不是从 prompt 文本猜测风格。数据下载后必须先用 `audit_dataset.py` 检查哈希、重复和语言分布。
 
 训练 judge 与测试 judge 分离。保存逐样本评分、原始 response、rubric version、置信度、结构化 option、gold match 和 probability。关键词 scorer 只允许做 CI/smoke。
 
