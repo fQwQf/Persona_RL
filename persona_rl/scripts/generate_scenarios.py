@@ -119,7 +119,8 @@ def main(
                 else "test"
             )
             # Keep both members of a counterfactual pair in the same family.
-            family = FAMILY_SPLITS[split][(index // 2) % len(FAMILY_SPLITS[split])]
+            split_offset = 0 if split == "train" else train_count if split == "validation" else train_count + validation_count
+            family = FAMILY_SPLITS[split][((index - split_offset) // 2) % len(FAMILY_SPLITS[split])]
         else:
             family = names[index % len(names)]
             split = (
