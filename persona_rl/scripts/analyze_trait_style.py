@@ -53,6 +53,29 @@ def main(scores: Path, output_dir: Path = Path("artifacts/trait_style")) -> None
     model = {method: {"formula": "Y ~ trait * style + (1|family) + (1|scenario)",
                       "estimator": "paired cell means; scenario/family are the pairing clusters",
                       "fixed_effects": value} for method, value in coefficients.items()}
+    try:
+        import pandas as pd
+        import statsmodels.formula.api as smf
+        frame = pd.DataFrame([{
+            "behavior_validity": row.behavior_validity,
+            "trait_level": next((v for v in row.prediction.target.values() if v), 0),
+            "style_family": row.prediction.style_family,
+            "family": row.prediction.family,
+            "scenario_id": row.prediction.scenario_id,
+            "method": row.prediction.method,
+        } for row in rows])
+        for method in methods:
+            subset = frame[frame["method"] == method]
+            if len(subset) >= 12 and subset["style_family"].nunique() >= 2:
+                fitted = smf.mixedlm(
+                    "behavior_validity ~ trait_level * C(style_family)",
+                    subset, groups=subset["family"],
+                ).fit(reml=False, disp=False)
+                model[method]["estimator"] = "statsmodels MixedLM; family random intercept"
+                model[method]["mixedlm_params"] = {str(k): float(v) for k, v in fitted.params.items()}
+                model[method]["mixedlm_pvalues"] = {str(k): float(v) for k, v in fitted.pvalues.items()}
+    except Exception:
+        model["_note"] = "Install pandas and statsmodels for MixedLM; paired contrasts remain available without them."
     (output_dir / "trait_style_model.json").write_text(json.dumps(model, indent=2, ensure_ascii=False), encoding="utf-8")
     (output_dir / "conflict_reversals.jsonl").write_text("".join(json.dumps(item, ensure_ascii=False) + "\n" for item in reversals), encoding="utf-8")
     # Dependency-free SVG heatmap keeps analysis runnable on CPU-only servers.
