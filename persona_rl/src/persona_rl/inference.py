@@ -96,30 +96,39 @@ def build_prompt(
     """Build a comparable prompt without exposing rubric labels to evaluation text."""
     target = record.target_z.model_dump()
     history = "\n".join(record.history)
+    style_instruction = {
+        "neutral": "Use neutral professional wording.",
+        "warm/polite": "Use warm and polite wording, while keeping the same decision and facts.",
+        "blunt/direct": "Use direct and concise wording, while keeping the same decision and facts.",
+        "formal": "Use formal wording, while keeping the same decision and facts.",
+        "terse": "Use very concise wording, while keeping the same decision and facts.",
+        "conversational": "Use natural conversational wording, while keeping the same decision and facts.",
+    }.get(record.style_family, "")
+    style_suffix = f"\nExpression style control: {style_instruction}" if style_instruction else ""
     if variant == "canonical":
         return (
             f"{system_prompt}\nMethod adapter: Follow the supplied target behavior code.\n"
             f"Target behavior code: {target}; intensity={record.target_intensity:.2f}\nSituation: {record.situation}\n"
-            f"Conversation history:\n{history}\nRespond to the user."
+            f"Conversation history:\n{history}\nRespond to the user.{style_suffix}"
         )
     if variant == "paraphrase":
         return (
             f"{system_prompt}\nUse the supplied target behavior code.\n"
             f"The target code is {target} at intensity {record.target_intensity:.2f}. First read the situation below, then answer it.\n"
             f"Situation: {record.situation}\nPrior turns:\n{history}\n"
-            "Give the final user-facing answer."
+            f"Give the final user-facing answer.{style_suffix}"
         )
     if variant == "minimal":
         return (
             f"{system_prompt}\nAdapter=target_behavior\nTarget={target}; intensity={record.target_intensity:.2f}\n"
-            f"User situation={record.situation}\nHistory={history}\nAnswer:"
+            f"User situation={record.situation}\nHistory={history}\nAnswer:{style_suffix}"
         )
     if variant == "formal":
-        return f"{system_prompt}\nTarget={target}\nSituation={record.situation}\nProvide a formal answer."
+        return f"{system_prompt}\nTarget={target}\nSituation={record.situation}\nProvide a formal answer.{style_suffix}"
     if variant == "terse":
-        return f"{system_prompt}\nTarget={target}\nSituation={record.situation}\nAnswer briefly."
+        return f"{system_prompt}\nTarget={target}\nSituation={record.situation}\nAnswer briefly.{style_suffix}"
     if variant == "conversational":
-        return f"{system_prompt}\nTarget={target}\nSituation={record.situation}\nReply conversationally."
+        return f"{system_prompt}\nTarget={target}\nSituation={record.situation}\nReply conversationally.{style_suffix}"
     raise ValueError(f"unknown prompt variant: {variant}")
 
 

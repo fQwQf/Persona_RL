@@ -4,6 +4,8 @@ from persona_rl.constraints import ConstraintReward, pc_dpo_scalar_loss
 from persona_rl.reporting import write_report
 from persona_rl.results import PredictionRecord, ScoreRecord, parse_method, write_models
 from persona_rl.schema import HiddenTask, Scenario, TargetTraits, parse_jsonl
+from pathlib import Path
+import os
 
 
 def test_metrics_on_paired_values() -> None:
@@ -98,6 +100,7 @@ def test_counterfactual_changes_one_trait_and_has_machine_task_options(tmp_path)
         ["uv", "run", "scripts/generate_scenarios.py", "--output", str(path), "--count", "20"],
         check=True,
         cwd=project,
+        env={**os.environ, "PYTHONPATH": str(project / "src")},
     )
     rows = parse_jsonl(str(path))
     pair = [row for row in rows if row.counterfactual_group == "cf_test_000000"]
@@ -117,3 +120,24 @@ def test_pc_dpo_penalizes_uncertain_reward() -> None:
     strong = ConstraintReward(1.0, 1.0, 1.0, 1.0, 1.0, 0.0)
     weak = ConstraintReward(1.0, 0.2, 0.2, 1.0, 1.0, 0.8)
     assert pc_dpo_scalar_loss(1.0, 0.0, weak) > pc_dpo_scalar_loss(1.0, 0.0, strong)
+
+
+def test_trait_style_matrix_is_balanced(tmp_path) -> None:
+    import subprocess
+    source = tmp_path / "source.jsonl"
+    matrix = tmp_path / "matrix.jsonl"
+    project = Path(__file__).resolve().parents[1]
+    subprocess.run(
+        ["uv", "run", "scripts/generate_scenarios.py", "--output", str(source), "--count", "24", "--seed", "3"],
+        check=True, cwd=project,
+        env={**os.environ, "PYTHONPATH": str(project / "src")},
+    )
+    subprocess.run(
+        ["uv", "run", "scripts/make_trait_style_matrix.py", str(source), "--output-path", str(matrix)],
+        check=True, cwd=project,
+        env={**os.environ, "PYTHONPATH": str(project / "src")},
+    )
+    rows = parse_jsonl(str(matrix))
+    assert len(rows) % 12 == 0
+    assert len(rows) >= 12
+    assert {row.style_family for row in rows} == {"neutral", "warm/polite", "blunt/direct", "formal", "terse", "conversational"}
