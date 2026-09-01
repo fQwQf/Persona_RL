@@ -13,6 +13,13 @@ import typer
 app = typer.Typer(no_args_is_help=True)
 
 
+def _reward_copies(weight: float) -> int:
+    """Keep every feasible positive-weight pair; duplicate only very strong pairs."""
+    if weight <= 0:
+        return 0
+    return 2 if weight >= 1.5 else 1
+
+
 @app.command()
 def main(
     dataset: Path,
@@ -58,7 +65,7 @@ def main(
         for row in rows:
             raw_reward = row.get("pc_reward", {})
             reward = reward_from_judge(raw_reward if isinstance(raw_reward, dict) else {})
-            copies = max(0, min(2, round(reward.weight())))
+            copies = _reward_copies(reward.weight())
             weighted.extend(
                 [
                     {
