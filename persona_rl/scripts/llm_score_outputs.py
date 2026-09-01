@@ -15,7 +15,7 @@ import urllib.request
 from pathlib import Path
 
 import typer
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from persona_rl.results import PredictionRecord, ScoreRecord, read_models, write_models
 from persona_rl.schema import Scenario, parse_jsonl
@@ -37,6 +37,22 @@ class JudgeScore(BaseModel):
     selected_option: str = ""
     gold_option_match: float | None = Field(default=None, ge=0, le=1)
     behavior_probability: float | None = Field(default=None, ge=0, le=1)
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_nullable_fields(cls, data):
+        # Judges often emit JSON null for fields that do not apply to a scenario.
+        # Normalize those values at the trust boundary instead of aborting a batch.
+        if not isinstance(data, dict):
+            return data
+        payload = dict(data)
+        if payload.get("selected_option") is None:
+            payload["selected_option"] = ""
+        if payload.get("flags") is None:
+            payload["flags"] = []
+        if payload.get("trait_scores") is None:
+            payload["trait_scores"] = {}
+        return payload
 
 
 def _request(endpoint: str, key: str, model: str, prompt: str) -> JudgeScore:
