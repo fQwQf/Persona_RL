@@ -121,6 +121,9 @@ def test_pc_dpo_penalizes_uncertain_reward() -> None:
     weak = ConstraintReward(1.0, 0.2, 0.2, 1.0, 1.0, 0.8)
     assert pc_dpo_scalar_loss(1.0, 0.0, weak) > pc_dpo_scalar_loss(1.0, 0.0, strong)
 
+    from persona_rl.constraints import reward_from_judge
+    assert reward_from_judge({"trait": 0.8, "criterion": 0.8, "invariance": 0.8, "truth": 0.9, "safety": 0.9, "uncertainty": 0.1}).weight() > 0
+
 
 def test_trait_style_matrix_is_balanced(tmp_path) -> None:
     import subprocess

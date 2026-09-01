@@ -55,12 +55,15 @@ def pc_dpo_scalar_loss(
 
 def reward_from_judge(payload: JudgeRewardPayload) -> ConstraintReward:
     """Parse judge heads at the data boundary into a typed reward object."""
+    def value(name: str, alias: str, default: float) -> float:
+        raw = payload.get(name, payload.get(alias, default))
+        return float(raw)
     return ConstraintReward(
-        trait=float(payload.get("trait_score", 0.0)),
-        criterion=float(payload.get("criterion_score", 0.0)),
-        invariance=float(payload.get("invariance_score", 0.0)),
-        truth=float(payload.get("truth_score", 0.0)),
-        safety=float(payload.get("safety_score", 0.0)),
+        trait=value("trait_score", "trait", 0.0),
+        criterion=value("criterion_score", "criterion", 0.0),
+        invariance=value("invariance_score", "invariance", 0.0),
+        truth=value("truth_score", "truth", 0.0),
+        safety=value("safety_score", "safety", 0.0),
         uncertainty=float(payload.get("uncertainty", 1.0)),
         rejected=bool(payload.get("rejected", False)),
     )
