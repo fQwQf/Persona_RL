@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Literal
 
 import typer
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -31,6 +31,18 @@ class JudgeResult(BaseModel):
     criterion_score: float = Field(default=0.5, ge=0, le=1)
     invariance_score: float = Field(default=0.5, ge=0, le=1)
     uncertainty: float = Field(default=0.0, ge=0, le=1)
+
+    @field_validator("winner", mode="before")
+    @classmethod
+    def normalize_winner(cls, value: object) -> object:
+        if isinstance(value, str):
+            aliases = {
+                "a": "a", "b": "b", "tie": "tie", "draw": "tie",
+                "candidate_a": "a", "candidate_b": "b",
+                "answer_a": "a", "answer_b": "b", "option_a": "a", "option_b": "b",
+            }
+            return aliases.get(value.strip().lower(), value)
+        return value
 
 
 class PairRow(BaseModel):
