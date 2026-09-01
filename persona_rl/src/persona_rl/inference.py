@@ -227,7 +227,7 @@ class InferenceEngine:
         record: Scenario,
         sample_index: int,
         variant: PromptVariant = "canonical",
-        language: str = "zh",
+        language: str | None = None,
     ) -> PredictionRecord:
         """Generate one response using the cached backend."""
         prompt = build_prompt(record, self.config.method, self.config.system_prompt, variant)
@@ -245,7 +245,7 @@ class InferenceEngine:
             target_intensity=record.target_intensity,
             prompt_variant=variant,
             style_family=record.style_family,
-            language=language,
+            language=record.language if language is None else language,
             temperature=self.config.temperature,
             sample_index=sample_index,
             prompt=prompt,
