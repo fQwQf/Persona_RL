@@ -186,7 +186,16 @@ def _make_hf_runner(config: InferenceConfig) -> Callable[[str], str]:
     model.eval()
 
     def run(prompt: str) -> str:
-        inputs = tokenizer(prompt, return_tensors="pt").to(device)
+        if getattr(tokenizer, "chat_template", None):
+            inputs = tokenizer.apply_chat_template(
+                [{"role": "user", "content": prompt}],
+                add_generation_prompt=True,
+                tokenize=True,
+                return_tensors="pt",
+                return_dict=True,
+            ).to(device)
+        else:
+            inputs = tokenizer(prompt, return_tensors="pt").to(device)
         with torch.inference_mode():
             output = model.generate(
                 **inputs,
