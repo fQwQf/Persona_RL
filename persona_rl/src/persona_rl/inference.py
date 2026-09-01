@@ -9,7 +9,12 @@ import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final, Literal, assert_never
+from typing import Final, Literal
+try:
+    from typing import assert_never
+except ImportError:  # Python 3.10 compatibility.
+    def assert_never(value: object) -> None:
+        raise AssertionError(f"unreachable value: {value!r}")
 
 from pydantic import BaseModel, ConfigDict, Field
 

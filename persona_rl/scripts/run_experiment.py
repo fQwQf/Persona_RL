@@ -13,7 +13,12 @@ import json
 import os
 import subprocess
 import sys
-from datetime import UTC, datetime
+from datetime import datetime
+try:
+    from datetime import UTC
+except ImportError:  # Python 3.10 compatibility for shared research servers.
+    from datetime import timezone
+    UTC = timezone.utc
 from pathlib import Path
 
 import typer

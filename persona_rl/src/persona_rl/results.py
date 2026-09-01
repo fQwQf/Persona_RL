@@ -3,7 +3,12 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime
+try:
+    from datetime import UTC
+except ImportError:  # Python 3.10 compatibility for shared research servers.
+    from datetime import timezone
+    UTC = timezone.utc
 from typing import Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
