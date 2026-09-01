@@ -33,6 +33,7 @@
 - `scripts/download_model.py`：通过 Hugging Face 镜像或 ModelScope 预下载模型并生成权重树 hash。
 - `scripts/analyze_trait_style.py`：输出 Trait × Style cell 和跨风格 trait effect。
 - `scripts/audit_dataset.py`：检查外部/生成 JSONL 的哈希、重复、空文本和语言分布。
+- `../docs/SERVER_SMOKE.md`：当前共享 GPU 节点的实测 smoke、模型分层和运行命令。
 - `scripts/train_dpo.py`：Direct-DPO/PC-DPO 训练入口。
 - `scripts/train_sft.py`：同模型、同 token budget 的 SFT LoRA 对照。
 - `scripts/evaluate.py`：聚合评测 JSONL。
