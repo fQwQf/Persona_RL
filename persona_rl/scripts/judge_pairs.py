@@ -36,12 +36,21 @@ class JudgeResult(BaseModel):
     @classmethod
     def normalize_winner(cls, value: object) -> object:
         if isinstance(value, str):
+            normalized = value.strip().lower().replace(" ", "_")
             aliases = {
-                "a": "a", "b": "b", "tie": "tie", "draw": "tie",
+                "a": "a", "b": "b", "tie": "tie", "tied": "tie", "draw": "tie", "equal": "tie", "same": "tie",
                 "candidate_a": "a", "candidate_b": "b",
                 "answer_a": "a", "answer_b": "b", "option_a": "a", "option_b": "b",
             }
-            return aliases.get(value.strip().lower(), value)
+            if normalized in aliases:
+                return aliases[normalized]
+            if "candidate_a" in normalized or "answer_a" in normalized or "option_a" in normalized:
+                return "a"
+            if "candidate_b" in normalized or "answer_b" in normalized or "option_b" in normalized:
+                return "b"
+            if any(token in normalized for token in ("tie", "draw", "equal", "same")):
+                return "tie"
+            return value
         return value
 
 
