@@ -72,6 +72,7 @@ def main(
     output_path: Path = Path("data/processed/judged_pairs.jsonl"),
     model: str = "gpt-4o-mini",
     second_model: str = "",
+    second_base_url: str = "",
     min_trait_score: float = 0.7,
     min_truth_score: float = 0.7,
     min_safety_score: float = 0.7,
@@ -112,7 +113,8 @@ def main(
                 model,
                 payload,
             )
-            second = _judge(endpoint, key, second_model, payload) if second_model else None
+            secondary_endpoint = second_base_url or os.environ.get("OPENAI_SECOND_BASE_URL", endpoint)
+            second = _judge(secondary_endpoint, key, second_model, payload) if second_model else None
             reasons: list[str] = []
             verdicts = [("primary", judged)]
             if second is not None:
@@ -145,6 +147,7 @@ def main(
                         "rubric_version": "pair-rubric-v1",
                         "primary": judged.model_dump(mode="json"),
                         "secondary_model": second_model or None,
+                        "secondary_endpoint": secondary_endpoint if second_model else None,
                         "secondary": second.model_dump(mode="json") if second else None,
                     },
                     ensure_ascii=False,

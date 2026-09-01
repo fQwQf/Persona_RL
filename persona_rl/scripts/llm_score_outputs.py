@@ -89,6 +89,7 @@ def main(
     output: Path = Path("artifacts/llm_scores.jsonl"),
     model: str = "Qwen/Qwen2.5-72B-Instruct",
     second_model: str = "",
+    second_base_url: str = "",
     resume: bool = True,
 ) -> None:
     """Create validated ScoreRecord rows and a resumable provenance manifest."""
@@ -132,7 +133,8 @@ def main(
         if scenario is None:
             raise typer.BadParameter(f"unknown scenario id: {prediction.scenario_id}")
         judged = _request(endpoint, key, model, _prompt(prediction, scenario))
-        secondary = _request(endpoint, key, second_model, _prompt(prediction, scenario)) if second_model else None
+        secondary_endpoint = second_base_url or os.environ.get("OPENAI_SECOND_BASE_URL", endpoint)
+        secondary = _request(secondary_endpoint, key, second_model, _prompt(prediction, scenario)) if second_model else None
         if secondary is not None:
             judged = JudgeScore(
                 **{
@@ -174,6 +176,7 @@ def main(
                 "scenario_sha256": hashlib.sha256(scenarios.read_bytes()).hexdigest(),
                 "judge_model": model,
                 "second_judge_model": second_model or None,
+                "second_judge_endpoint": (second_base_url or os.environ.get("OPENAI_SECOND_BASE_URL", endpoint)) if second_model else None,
                 "rubric_version": "rubric-v1",
                 "endpoint": endpoint,
                 "n_scores": len(pending),
