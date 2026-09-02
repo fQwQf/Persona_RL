@@ -1,0 +1,26 @@
+{
+  "method": "pc-dpo",
+  "objective": "reward-weighted-constraint-dpo",
+  "constraint_heads": [
+    "trait",
+    "criterion",
+    "invariance",
+    "truth",
+    "safety",
+    "uncertainty"
+  ],
+  "model": "/data1/tongjizhou/.cache/modelscope/Qwen/Qwen2___5-1___5B-Instruct",
+  "model_revision": "",
+  "dataset": "/tmp/persona_pilot_judged_primary.jsonl",
+  "seed": 7,
+  "epochs": 3.0,
+  "batch_size": 1,
+  "grad_accumulation": 1,
+  "learning_rate": 5e-06,
+  "max_length": 512,
+  "use_lora": true,
+  "qlora": false,
+  "bf16": false,
+  "local_rank": "0",
+  "resume_from_checkpoint": null
+}

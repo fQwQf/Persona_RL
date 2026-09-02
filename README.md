@@ -73,6 +73,7 @@ PERSONA_RL_REVIEWER=alice uv run scripts/human_score.py \
 - `persona_rl/configs/`：实验矩阵与固定外部 baseline provenance。
 - `persona_rl/REFERENCES.md`：论文、源码、数据集和 BibTeX。
 - `CB_DPO_方法与评测实现规范.md`：方法与评测契约。
+- `results/pilot_1_5b/`：从服务器同步的 1.5B 试跑数据、评分和 provenance。
 - `docs/archive/`：早期研究草稿，仅供历史参考。
 
 外部算法源码通过 GitHub CLI 获取并保留原始仓库；它们只在明确可复现时进入比较，PersonaForge 是 related work，不是 baseline。发布前运行：

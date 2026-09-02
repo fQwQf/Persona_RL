@@ -1,0 +1,10 @@
+{
+  "schema_version": "candidate-expansion-v1",
+  "input_path": "/tmp/persona_pilot_scenarios.jsonl",
+  "input_sha256": "36b63b1d7804d41653947036ef5250e6894e0cddf1086dae9552f417c1da0302",
+  "output_path": "/tmp/persona_pilot_candidates.jsonl",
+  "model": "llama8b",
+  "split": "train",
+  "candidates_per_scenario": 2,
+  "n_rows": 168
+}

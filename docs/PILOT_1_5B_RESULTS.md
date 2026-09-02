@@ -29,7 +29,7 @@ judge run using Qwen-1.5B as the second judge accepted zero rows because the
 small judge was systematically uncertain/disagreeing; it was not used to
 train the reported checkpoints.
 
-Remote artifact paths:
+Remote artifact paths (mirrored under `results/pilot_1_5b/` in this repository):
 
 ```text
 /tmp/persona_pilot_scenarios.jsonl
@@ -128,4 +128,3 @@ use a judge not involved in preference mining plus a small blinded human audit.
 For a faster formal run, use vLLM for batched policy inference. The serial HF
 backend used here took roughly 8--11 minutes per 72-output method; that is
 appropriate for correctness checks but not for the full experiment.
-

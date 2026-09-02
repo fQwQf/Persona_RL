@@ -1,0 +1,13 @@
+{
+  "schema_version": "llm-score-v1",
+  "prediction_path": "/tmp/pilot_eval_test_all.jsonl",
+  "prediction_sha256": "c2a01b94b8ff77bf92d6f6dd771639e306fd8f5f7860fd18dd8b1b83c2f78020",
+  "scenario_path": "/tmp/persona_pilot_scenarios.jsonl",
+  "scenario_sha256": "36b63b1d7804d41653947036ef5250e6894e0cddf1086dae9552f417c1da0302",
+  "judge_model": "llama8b",
+  "second_judge_model": null,
+  "second_judge_endpoint": null,
+  "rubric_version": "rubric-v1",
+  "endpoint": "http://127.0.0.1:18001/v1/chat/completions",
+  "n_scores": 216
+}

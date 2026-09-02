@@ -53,6 +53,15 @@ mlruns/
 .DS_Store
 Thumbs.db
 
+# Curated, small, immutable pilot artifacts are versioned for reproducibility.
+# Large checkpoints and scratch runs remain covered by the rules above.
+!results/
+!results/pilot_1_5b/
+!results/pilot_1_5b/*.jsonl
+!results/pilot_1_5b/*.json
+!results/pilot_1_5b/*.csv
+!results/pilot_1_5b/*.md
+
 # Keep empty published directory skeletons
 !persona_rl/artifacts/
 persona_rl/artifacts/*
